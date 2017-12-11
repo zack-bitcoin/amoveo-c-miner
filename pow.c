@@ -1,7 +1,14 @@
-
 #include <stdio.h>
 //#include <memory.h>
 //#include <string.h>
+//#define pair2sci(A) ((exponent(2, l[0]) * (256 + b)) / 256)
+#define int2pair_macro(p)\
+  int x[2];\
+  int a = (lg(p) - 1);\
+  int b = (((p * 256) / (exponent(2, a))) - 256);\
+  x[0] = a;\
+  x[1] = b;
+  
 
 int exponent(int a, int b)
 {
@@ -21,7 +28,6 @@ int hash2integer(int* binary, int x)
 {
   return(0);
 }
-
 int pair2int(int l[2])
 {
   int a = l[0];
@@ -41,31 +47,32 @@ int lg(int n)
   }
   return (1+(lg(n / 2)));
 }
-int* int2pair(int p)
+void int2pair(int p, int x[2])
 {
-  int x[2];
   int a = (lg(p) - 1);
   int b = (((p * 256) / (exponent(2, a))) - 256);
   x[0] = a;
   x[1] = b;
-  return(x);
 }
-int sci2pair(int i)
+void sci2pair(int i, int x[2])
 {
   int a = (i / 256);
   int b = (i % 256);
-  int x[2];
   x[0] = a;
   x[1] = b;
-  return(x);
 }
 int sci2int(int x)
 {
-  return(pair2int(sci2pair(x)));
+  int y[2];
+  sci2pair(x, y);
+  pair2int(y);
+  return(pair2int(y));
 }
 int int2sci(int x)
 {
-  return(pair2sci(int2pair(x)));
+  int y[2];
+  int2pair(x, y);
+  return(pair2sci(y));
 }
 int check_pow(int nonce, int difficulty, int data) {
   //Y = <<data/binary, difficulty:16, nonce:256>>,
@@ -78,7 +85,6 @@ int check_pow(int nonce, int difficulty, int data) {
 
 int main()
 {
-  printf("here\n");
-  printf("%i\n", (5 > 2));
+  printf("%i\n", (int2sci(sci2int(5000))));
   return(0);
 }
