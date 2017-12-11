@@ -5,7 +5,9 @@
 
 WORD hash2integer(BYTE h[32]);
 static WORD pair2sci(WORD l[2]);
+static BYTE* next_nonce(BYTE nonce[32]);
 int check_pow(BYTE nonce[32], int, BYTE data[32]);
+BYTE* mine(BYTE nonce[32], int, BYTE data[32]);
 
 WORD hash2integer(BYTE h[32]) {
   WORD x = 0;
@@ -45,14 +47,12 @@ int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
   SHA256_CTX ctx;
   BYTE buf[32];
   BYTE text[66];//32+2+32
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++) 
     text[i] = data[i];
-  }
   text[32] = difficulty / 256;
   text[33] = difficulty % 256;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++) 
     text[i+34] = nonce[i];
-  }
   sha256_init(&ctx);
   sha256_update(&ctx, text, 66);
   sha256_final(&ctx, buf);
@@ -61,7 +61,7 @@ int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
   //printf("%d pow check pow \n", i);
   return(i > difficulty);
 }
-BYTE* next_nonce(BYTE nonce[32]){
+static BYTE* next_nonce(BYTE nonce[32]){
   for (int i = 0; i < 32; i++) {
     if (nonce[i] == 255) {
       nonce[i] = 0;
@@ -74,9 +74,8 @@ BYTE* next_nonce(BYTE nonce[32]){
 }
 BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   while (1) {
-    if (check_pow(nonce, difficulty, data)) {
+    if (check_pow(nonce, difficulty, data)) 
       return nonce;
-    }
     nonce = next_nonce(nonce);
   }
 }
@@ -84,7 +83,7 @@ BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
 int main()
 {
   BYTE x[32] = {
-    1,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0
@@ -101,12 +100,19 @@ int main()
   //printf("%i\n", (check_pow(x, 1000, y)));
   WORD difficulty = 5003;
   mine(x, difficulty, y); //nonce, difficulty, data
-  printf("\
-%i, %i, %i, %i, \
-%i, %i, %i, %i, \
-\n",
+  printf("%i, %i, %i, %i, %i, %i, %i, %i, \n",
          x[0], x[1], x[2], x[3],
-         x[4], x[5], x[6], x[7]
-         );
+         x[4], x[5], x[6], x[7]);
+
+  //write the nonce to a file
+  FILE *f = fopen("nonce.txt", "w");
+  if (f == NULL)
+    {
+      printf("Error opening file!\n");
+      //exit(1);
+    }
+  fprintf(f, "%s", x);
+  fclose(f);
+
   return(0);
 }
