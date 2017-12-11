@@ -1,0 +1,6 @@
+==== Amoveo C miner
+
+By writing a miner for Amoveo in C, it becomes easier to write miners for the GPU and FPGAs.
+This simple C miner is a template for making miners in other languages.
+
+For now, this is the best miner available for Amoveo.
