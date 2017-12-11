@@ -99,8 +99,14 @@ int main()
   //printf("%i\n", (hash2integer(y)));
   //printf("%i\n", (check_pow(x, 1, x)));
   //printf("%i\n", (check_pow(x, 1000, y)));
-  WORD difficulty = 4303;
+  WORD difficulty = 5003;
   mine(x, difficulty, y); //nonce, difficulty, data
-  printf("%i, %i, %i, %i, \n", x[0], x[1], x[2], x[3]);
+  printf("\
+%i, %i, %i, %i, \
+%i, %i, %i, %i, \
+\n",
+         x[0], x[1], x[2], x[3],
+         x[4], x[5], x[6], x[7]
+         );
   return(0);
 }
