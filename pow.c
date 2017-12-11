@@ -77,7 +77,16 @@ BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
     nonce = next_nonce(nonce);
   }
 }
-
+void write_nonce(BYTE x[32]) {
+  FILE *f = fopen("nonce.txt", "w");
+  if (f == NULL) {
+      printf("Error opening file!\n");
+      //exit(1);
+    }
+  fprintf(f, "%s", x);
+  fclose(f);
+  return;
+}
 int main()
 {
   BYTE x[32] = {
@@ -102,15 +111,7 @@ int main()
          x[0], x[1], x[2], x[3],
          x[4], x[5], x[6], x[7]);
 
-  //write the nonce to a file
-  FILE *f = fopen("nonce.txt", "w");
-  if (f == NULL)
-    {
-      printf("Error opening file!\n");
-      //exit(1);
-    }
-  fprintf(f, "%s", x);
-  fclose(f);
-
+  write_nonce(x);
+  
   return(0);
 }
