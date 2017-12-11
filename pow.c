@@ -3,9 +3,19 @@
 #include <string.h>
 #include "sha256.h"
 
-WORD pair2sci(WORD l[2]);
+//static WORD exponent(WORD, WORD);
+WORD hash2integer(BYTE h[32]);
+//static WORD pair2int(WORD l[2]);
+static WORD pair2sci(WORD l[2]);
+//static WORD lg(WORD);
+//static void int2pair(WORD, WORD l[2]);
+//static void sci2pair(WORD, WORD l[2]);
+//static WORD sci2int(WORD);
+//static WORD int2sci(WORD);
+int check_pow(BYTE nonce[32], int, BYTE data[32]);
 
-WORD exponent(WORD a, WORD b) {
+/*
+static WORD exponent(WORD a, WORD b) {
   if (b == 0) {
     return(1);
   }
@@ -17,6 +27,7 @@ WORD exponent(WORD a, WORD b) {
   }
   return (a * (exponent(a, (b - 1))));
 }
+*/
 
 WORD hash2integer(BYTE h[32]) {
   WORD x = 0;
@@ -47,41 +58,45 @@ WORD hash2integer(BYTE h[32]) {
   //printf("y1 is %d\n", y[1]);
   return(pair2sci(y));
 }
-WORD pair2int(WORD l[2]) {
+/*
+static WORD pair2int(WORD l[2]) {
   WORD a = l[0];
   WORD b = l[1];
   return((exponent(2, a) * (256 + b)) / 256);
 }
-WORD pair2sci(WORD l[2]) {
+*/
+static WORD pair2sci(WORD l[2]) {
   WORD a = l[0];
   WORD b = l[1];
   return((256*a) + b);
 }
-WORD lg(WORD n) {
+/*
+static WORD lg(WORD n) {
   if (n == 1) {
     return(n);
   }
   return (1+(lg(n / 2)));
 }
-void int2pair(WORD p, WORD x[2]) {
+static void int2pair(WORD p, WORD x[2]) {
   WORD a = (lg(p) - 1);
   x[0] = a;
   x[1] = (((p * 256) / (exponent(2, a))) - 256);
 }
-void sci2pair(WORD i, WORD x[2]) {
+static void sci2pair(WORD i, WORD x[2]) {
   x[0] = (i / 256);
   x[1] = (i % 256);
 }
-WORD sci2int(WORD x) {
+static WORD sci2int(WORD x) {
   WORD y[2];
   sci2pair(x, y);
   return(pair2int(y));
 }
-WORD int2sci(WORD x) {
+static WORD int2sci(WORD x) {
   WORD y[2];
   int2pair(x, y);
   return(pair2sci(y));
 }
+*/
 int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
 
   SHA256_CTX ctx;
@@ -100,8 +115,27 @@ int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
   sha256_final(&ctx, buf);
   
   int i = hash2integer(buf);
-  printf("%d pow check pow \n", i);
+  //printf("%d pow check pow \n", i);
   return(i > difficulty);
+}
+BYTE* next_nonce(BYTE nonce[32]){
+  for (int i = 0; i < 32; i++) {
+    if (nonce[i] == 255) {
+      nonce[i] = 0;
+    } else {
+      nonce[i] += 1;
+      return nonce;
+    }
+  }
+  return(0);
+}
+BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  while (1) {
+    if (check_pow(nonce, difficulty, data)) {
+      return nonce;
+    }
+    nonce = next_nonce(nonce);
+  }
 }
 
 
@@ -122,8 +156,12 @@ int main()
   //printf("%i\n", (hash2integer(x)));
   //printf("%i\n", (hash2integer(y)));
   //nonce difficulty data
-  printf("%i\n", (check_pow(x, 1, x)));
-  printf("%i\n", (check_pow(x, 1000, x)));
-  printf("%i\n", (check_pow(x, 1000, y)));
+  //printf("%i\n", (check_pow(x, 1, x)));
+  //printf("%i\n", (check_pow(x, 1000, x)));
+  //printf("%i\n", (check_pow(x, 1000, y)));
+  //BYTE n[32] ;
+  WORD difficulty = 4303;
+  mine(x, WORD, y); //nonce, difficulty, data
+  printf("%i, %i, %i, %i, \n", x[0], x[1], x[2], x[3]);
   return(0);
 }
