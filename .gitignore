@@ -3,3 +3,6 @@ nonce.txt
 .git
 *.o
 *.beam
+amoveo_c_miner
+mining_input
+nonce.txt
