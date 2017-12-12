@@ -2,8 +2,8 @@
 
 #first recompile the C.
 gcc -Wall -c sha256.c
-gcc -Wall -c pow.c
-gcc sha256.o pow.o -o amoveo_c_miner
+gcc -Wall -c amoveo_pow.c
+gcc sha256.o amoveo_pow.o -o amoveo_c_miner
 rm *.o
 #./main
 # next recompile the erlang.
