@@ -53,7 +53,6 @@ static WORD pair2sci(WORD l[2]) {
   return((256*l[0]) + l[1]);
 }
 int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
-
   BYTE text[66];//32+2+32
   for (int i = 0; i < 32; i++) 
     text[i] = data[i];
@@ -66,7 +65,6 @@ int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
   sha256_update(&ctx, text, 66);
   BYTE buf[32];
   sha256_final(&ctx, buf);
-  
   int i = hash2integer(buf);
   //printf("pow did this much work %d \n", i);
   return(i > difficulty);
@@ -84,7 +82,6 @@ static BYTE* next_nonce(BYTE nonce[32]){
 }
 BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   while (1) {
-    //printf("mining\n");
     if (check_pow(nonce, difficulty, data)) 
       return nonce;
     nonce = next_nonce(nonce);
@@ -97,21 +94,16 @@ void write_nonce(BYTE x[32]) {
       //exit(1);
     }
   rewind(f);
-  //fprintf(f, "%s", x);
   fwrite(x, 1, 32, f);
   fclose(f);
   return;
 }
 int read_input(BYTE B[32], BYTE N[32]) {
   FILE *fileptr;
-  //char *buffer;
-  //long filelen;
-
-  fileptr = fopen("mining_input", "rb");  // Open the file in binary mode
-  fseek(fileptr, 0, SEEK_END);          // Jump to the end of the file
-  int filelen = ftell(fileptr);             // Get the current byte offset in the file
+  fileptr = fopen("mining_input", "rb");
+  fseek(fileptr, 0, SEEK_END);  // Jump to the end of the file
+  int filelen = ftell(fileptr); // Get the current byte offset in the file
   rewind(fileptr); 
-
   fread(B, 32, 1, fileptr);
   fread(N, 32, 1, fileptr);
   BYTE buffer[10];
@@ -126,7 +118,6 @@ int read_input(BYTE B[32], BYTE N[32]) {
     diff *= 10;
     diff += (c - '0');
   }
-  
   fclose(fileptr); // Close the file
   return diff;
 }
@@ -138,6 +129,8 @@ int main()
   mine(nonce, diff, bhash); //nonce, difficulty, data
   write_nonce(nonce);
   //test_check_pow();
+  //test_hash();
+  //test_hash2integer();
   return(0);
 }
 void test_check_pow() {
@@ -183,25 +176,3 @@ void test_hash2integer() {
   // should be 32968
   return;
 }
-
-/*
-["pow","fhRzEfYz34zyYf+76zvvvW3QQPjeFy6QhLcZd9NJCEM=",6452,114719552758006781619496202257071179514670008855271061514073092320978544337709]
-pow:check_pow(x, 32).
-
-//take hash of data.
-//put nonce into binary.
-check_pow(nonce, 6453, data);
-    
-
-check_pow(P, HashSize) ->
-    HashSize = 32,
-    N = P#pow.nonce,
-    Diff = P#pow.difficulty,
-    Data = P#pow.data,
-    H1 = hash:doit(Data, HashSize),
-    X = HashSize*8,
-    Y = <<H1/binary, Diff:16, N:X>>,
-    H2 = hash:doit(Y, HashSize),
-    I = hash2integer(H2),
-    I > Diff.
-*/
