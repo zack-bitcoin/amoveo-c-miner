@@ -28,10 +28,13 @@ doit2(R) ->
     BinNonce = base64:encode(<<Nonce:256>>),
     Data = << <<"[\"mining_data\",\"">>/binary, BinNonce/binary, <<"\"]">>/binary>>,
     talk_helper(Data, ?Peer, 10),
+    io:fwrite("Found a block.\n"),
     timer:sleep(1000),
-    start().
+    start2().
 start() ->
-    io:fwrite("started mining."),
+    io:fwrite("Started mining.\n"),
+    start2().
+start2() ->
     Data = <<"[\"mining_data\"]">>,
     R = talk_helper(Data, ?Peer, 10),
     doit2(R).
