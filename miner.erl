@@ -7,10 +7,6 @@ start_many(N, _) when N < 1-> [];
 start_many(N, Me) -> 
     Pid = spawn(fun() -> Me ! os:cmd("./amoveo_c_miner") end),
     [Pid|start_many(N-1, Me)].
-get_pids(0) -> [];
-get_pids(N) ->
-    Y = receive X -> X end,
-    [Y|get_pids(N-1)].
 kill_os_mains() -> os:cmd("killall amoveo_c_miner").
 doit2(R) ->
     <<_:(8*11), R2/binary>> = list_to_binary(R),
@@ -35,6 +31,7 @@ doit2(R) ->
     timer:sleep(1000),
     start().
 start() ->
+    io:fwrite("started mining."),
     Data = <<"[\"mining_data\"]">>,
     R = talk_helper(Data, ?Peer, 10),
     doit2(R).
@@ -46,7 +43,7 @@ talk_helper(Data, Peer, N) ->
                 {ok, {_Status, _Headers, []}} ->
                     talk_helper(Data, Peer, N - 1);
                 {ok, {_, _, R}} -> R;
-                _ -> io:fwrite("\nYou need to turn on and sync your Amoveo node before you can mine. You can get it here: https://github.com/zack-bitcoin/amoveo \n").
+                _ -> io:fwrite("\nYou need to turn on and sync your Amoveo node before you can mine. You can get it here: https://github.com/zack-bitcoin/amoveo \n"),
                      1=2
             end
     end.
