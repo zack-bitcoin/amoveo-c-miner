@@ -2,3 +2,4 @@ nonce.txt
 *~
 .git
 *.o
+*.beam

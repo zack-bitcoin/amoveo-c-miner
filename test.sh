@@ -16,3 +16,4 @@ echo $first
 echo "second is "
 echo $second
 
+erl -noshell -s program main $first $second -s init stop
