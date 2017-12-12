@@ -77,7 +77,7 @@ talk_helper(Data, Peer, N) ->
                 {ok, {_Status, _Headers, []}} ->
                     talk_helper(Data, Peer, N - 1);
                 {ok, {_, _, R}} -> R;
-                _ -> io:fwrite("talk helper unexpected"),
+                _ -> io:fwrite("\nYou need to turn on and sync your Amoveo node before you can mine. You can get it here: https://github.com/zack-bitcoin/amoveo \n").
                      1=2
             end
     end.

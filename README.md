@@ -19,6 +19,10 @@ Then to kill the miner processes, do:
 sh clean.sh
 ```
 
+By default it uses 3 threads for mining. To change this, change the line near the top of `miner.erl`
+It says `-define(CORES, 3).`.
+Change the 3 to the number of threads that you want to mine with. Usually, this should be the same as, or one less than the number of CPU cores on your computer.
+
 [The build.sh install script works for ubuntu linux](build.sh). If you are using a different system, you will have to make some simple changes.
 
 By writing a miner for Amoveo in C, it becomes easier to write miners for the GPU and FPGAs.
