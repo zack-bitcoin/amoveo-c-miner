@@ -4,7 +4,7 @@ Amoveo C miner
 This is the best miner for Amoveo currently available.
 
 It expects that you are running a full node of Amoveo using port 8080, which is the default port.
-[Here is a link to the main Amoveo repo, you need this running to use the miner.](https://github.com/zack-bitcoin/amoveo)
+[Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo)
 
 On ubuntu, it can be compiled and turned on like this: 
 ```
