@@ -19,7 +19,7 @@ Then to kill the miner processes, do:
 sh clean.sh
 ```
 
-[This install script works for ubuntu linux](build.sh). If you are using a different system, you will have to make some simple changes.
+[The build.sh install script works for ubuntu linux](build.sh). If you are using a different system, you will have to make some simple changes.
 
 By writing a miner for Amoveo in C, it becomes easier to write miners for the GPU and FPGAs.
 This simple C miner is a template for making miners in other languages.
