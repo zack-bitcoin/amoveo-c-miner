@@ -8,7 +8,8 @@ It expects that you are running a full node of Amoveo using port 8080, which is 
 
 On ubuntu, it can be compiled and turned on like this: 
 ```
-sh build.sh 
+cd solo_miner #first go to the solo-miner part of the repository.
+sh build_ubuntu.sh #run the ubuntu build script
 ```
 Then you start mining like this:
 ```
