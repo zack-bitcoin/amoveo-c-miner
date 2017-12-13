@@ -23,6 +23,7 @@ start() ->
     start2().
 start2() ->
     kill_os_mains(),
+    flush(),
     Data = <<"[\"mining_data\"]">>,
     R = talk_helper(Data, ?Peer, 10),
     start_c_miners(R).
@@ -39,9 +40,9 @@ start_c_miners(R) ->
     BinNonce = base64:encode(<<Nonce:256>>),
     Data = << <<"[\"mining_data\",\"">>/binary, BinNonce/binary, <<"\"]">>/binary>>,
     %talk_helper2(Data, ?Peer),
-    talk_helper(Data, ?Peer, 10),
+    talk_helper(Data, ?Peer, 40),%spend 8 seconds checking 5 times per second if we can start mining again.
     io:fwrite("Found a block.\n"),
-    timer:sleep(1000),
+    timer:sleep(200),
     start2().
 talk_helper2(Data, Peer) ->
     httpc:request(post, {Peer, [], "application/octet-stream", iolist_to_binary(Data)}, [{timeout, 3000}], []).
@@ -53,6 +54,7 @@ talk_helper(Data, Peer, N) ->
         true -> 
             case talk_helper2(Data, Peer) of
                 {ok, {_Status, _Headers, []}} ->
+                    timer:sleep(200),
                     talk_helper(Data, Peer, N - 1);
                 {ok, {_, _, R}} -> R;
                 _ -> io:fwrite("\nYou need to turn on and sync your Amoveo node before you can mine. You can get it here: https://github.com/zack-bitcoin/amoveo \n"),
