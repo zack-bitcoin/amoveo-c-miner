@@ -93,7 +93,7 @@ void write_nonce(BYTE x[32]) {
   FILE *f = fopen("nonce.txt", "w");
   if (f == NULL) {
       printf("Error opening file!\n");
-      exit(1);
+      //exit(1);
     }
   rewind(f);//unnecessary line?
   fwrite(x, 1, 32, f);

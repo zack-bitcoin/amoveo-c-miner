@@ -1,0 +1,2 @@
+./rebar3 as ./config/sys.config release
+#./rebar3 compile

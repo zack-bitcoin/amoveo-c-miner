@@ -39,3 +39,9 @@ De Bruin is a great idea for mining because I would only have to change 1 bit be
 I had never heard of bsf and bsr instructions, but it looks like they might be doing exactly what I need.
 
 https://en.wikipedia.org/wiki/De_Bruijn_sequence
+
+Report back with performance difference. I'm curious.
+
+The only time I've ever used the instruction was in C#. To call it I allocated unmanaged memory and assigned x86 OP Codes to it, then assigned that memory to a delegate.
+
+The overhead of calling a delegate plus the transition from unmanaged to managed code ended up causing it to be 3x slower than a C# De Bruijn function but only 20 percent slower than using a naive for loop
