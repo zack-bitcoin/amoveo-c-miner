@@ -22,8 +22,8 @@ doit2(R) ->
 % when the c program terminates, we read the response from a different file.
     start_many(?CORES, self()),
     receive _ -> ok end,
-    kill_os_mains(),
     flush(),
+    kill_os_mains(),
     {ok, <<Nonce:256>>} = file:read_file("nonce.txt"),
     BinNonce = base64:encode(<<Nonce:256>>),
     Data = << <<"[\"mining_data\",\"">>/binary, BinNonce/binary, <<"\"]">>/binary>>,

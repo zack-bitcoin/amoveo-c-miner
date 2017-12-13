@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <memory.h>
 #include <string.h>
 #include "sha256.h"
+
+//maybe use <stdint.h>
 
 WORD hash2integer(BYTE h[32]);
 static WORD pair2sci(WORD l[2]);
@@ -70,6 +71,7 @@ int check_pow(BYTE nonce[32], int difficulty, BYTE data[32]) {
   return(i > difficulty);
 }
 static BYTE* next_nonce(BYTE nonce[32]){
+  //we should use 32 bit or 64 bit integer
   for (int i = 0; i < 32; i++) {
     if (nonce[i] == 255) {
       nonce[i] = 0;
@@ -91,9 +93,9 @@ void write_nonce(BYTE x[32]) {
   FILE *f = fopen("nonce.txt", "w");
   if (f == NULL) {
       printf("Error opening file!\n");
-      //exit(1);
+      exit(1);
     }
-  rewind(f);
+  rewind(f);//unnecessary line?
   fwrite(x, 1, 32, f);
   fclose(f);
   return;
@@ -103,6 +105,7 @@ int read_input(BYTE B[32], BYTE N[32]) {
   fileptr = fopen("mining_input", "rb");
   fseek(fileptr, 0, SEEK_END);  // Jump to the end of the file
   int filelen = ftell(fileptr); // Get the current byte offset in the file
+  //ftell returns a long, maybe we shouldn't truncate it.
   rewind(fileptr); 
   fread(B, 32, 1, fileptr);
   fread(N, 32, 1, fileptr);
@@ -135,11 +138,11 @@ int main()
 }
 void test_check_pow() {
   //["pow","2w1EW/I07ZnVg8hK4TzPEUA2XXyh2MpdyLgntn/42dI=",6452,995842502870377667814772]
-  BYTE data[32] = {
+  static BYTE data[32] = {
     70,131,192,39,4,93,79,150,232,178,119,91,87,183,101,245,
     48,56,180,196,47,44,184,68,130,255,91,39,44,98,51,216
   };
-  BYTE nonce[32] = {
+  static BYTE nonce[32] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,210,224,186,
     241,224,230,139,188,229,116
   };
@@ -149,7 +152,7 @@ void test_check_pow() {
   return;
 }
 void test_hash() {
-  BYTE bhash[32];
+  BYTE bhash[66] = {0};
   SHA256_CTX ctx;
   for (int i = 0; i < 66; i++) {
     bhash[i] = 0;
