@@ -2,6 +2,9 @@
 -export([start/0, unpack_mining_data/1]).
 -define(Peer, "http://localhost:8081/").
 -define(CORES, 3).
+-define(mode, pool).
+-define(Pubkey, <<"BHuqX6EKohvveqkcbyGgE247jQ5O0i2YKO27Yx50cXd+8J/dCVTnMz8QWUUS9L5oGWUx5CPtseeHddZcygmGVaM=">>).
+
 
 start_many(N, _) when N < 1-> [];
 start_many(N, Me) -> 
@@ -34,14 +37,15 @@ start_c_miners(R) ->
 % when the c program terminates, we read the response from a different file.
     start_many(?CORES, self()),
     receive _ -> ok end,
+    io:fwrite("Found a block.\n"),
     kill_os_mains(),
     flush(),
     {ok, <<Nonce:256>>} = file:read_file("nonce.txt"),
     BinNonce = base64:encode(<<Nonce:256>>),
-    Data = << <<"[\"mining_data\",\"">>/binary, BinNonce/binary, <<"\"]">>/binary>>,
+    Data = << <<"[\"work\",\"">>/binary, BinNonce/binary, <<"\",\"">>/binary, ?Pubkey/binary, <<"\"]">>/binary>>,
     %talk_helper2(Data, ?Peer),
-    talk_helper(Data, ?Peer, 40),%spend 8 seconds checking 5 times per second if we can start mining again.
-    io:fwrite("Found a block.\n"),
+    talk_helper(Data, ?Peer, 40),%spend 8 seconds checking 5 times per second if we can start mining  again.
+    io:fwrite("Found a block. 2\n"),
     timer:sleep(200),
     start2().
 talk_helper2(Data, Peer) ->
