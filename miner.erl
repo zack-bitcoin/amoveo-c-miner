@@ -1,10 +1,11 @@
--module(miner).
+-module(miner)
+.
 -export([start/0, unpack_mining_data/1]).
 -define(Peer, "http://localhost:8085/").
 -define(CORES, 3).
 -define(mode, pool).
 -define(Pubkey, <<"BHjaeLteq9drDIhp8d0R6JmUqkivIW1M0Yoh5rsGnw4wePMKowcNGHqfttAF52jMYhsZicFr7eIOWN/Sr0XI+OI=">>).
--define(period, 6).%how long to wait in seconds before checking if new mining data is available.
+-define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 %This should probably be around 1/20th of the blocktime.
 
 
@@ -33,8 +34,9 @@ start2() ->
     R = talk_helper(Data, ?Peer, 10),
     start_c_miners(R).
 start_c_miners(R) ->
-    {F, S, Third} = unpack_mining_data(R),
-    file:write_file("mining_input", <<F/binary, S/binary, Third/binary>>),
+    {F, _, Third} = unpack_mining_data(R), %S is the nonce
+    RS = crypto:strong_rand_bytes(32),
+    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),
 %we write these bytes into a file, and then call the c program, and expect the c program to read the file.
 % when the c program terminates, we read the response from a different file.
     start_many(?CORES, self()),

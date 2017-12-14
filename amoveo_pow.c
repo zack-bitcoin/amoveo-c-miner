@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
   //printf("argc is %i\n", argc);
   //printf("id is %i\n", id);
   int diff = read_input(bhash, nonce, id);
-  //printf("difficulty is %i\n", diff);
+  printf("difficulty is %i\n", diff);
   mine(nonce, diff, bhash); //nonce, difficulty, data
   write_nonce(nonce);
   //test_check_pow();
