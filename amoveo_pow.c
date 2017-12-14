@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "sha256.h"
 
@@ -100,7 +101,7 @@ void write_nonce(BYTE x[32]) {
   fclose(f);
   return;
 }
-int read_input(BYTE B[32], BYTE N[32]) {
+int read_input(BYTE B[32], BYTE N[32], WORD id) {
   FILE *fileptr;
   fileptr = fopen("mining_input", "rb");
   fseek(fileptr, 0, SEEK_END);  // Jump to the end of the file
@@ -109,7 +110,11 @@ int read_input(BYTE B[32], BYTE N[32]) {
   rewind(fileptr); 
   fread(B, 32, 1, fileptr);
   fread(N, 32, 1, fileptr);
-  BYTE buffer[10];
+  N[0] = id % 256;
+  N[1] = (id / 256) % 256;
+  N[2] = ((id / 256) / 256) % 256;
+  N[3] = (((id / 256) / 256) / 256) % 256;
+  BYTE buffer[10] = { 0 };
   fread(buffer, filelen-64, 1, fileptr);
   int diff = 0;
   BYTE c = 1;
@@ -124,11 +129,20 @@ int read_input(BYTE B[32], BYTE N[32]) {
   fclose(fileptr); // Close the file
   return diff;
 }
-int main()
+int main(int argc, char *argv[])
 {
   BYTE bhash[32];
   BYTE nonce[32];
-  int diff = read_input(bhash, nonce);
+  WORD id;
+  if (argc > 1) {
+    id = atoi(argv[1]);
+  } else {
+    id = 0;
+  }
+  //printf("argc is %i\n", argc);
+  //printf("id is %i\n", id);
+  int diff = read_input(bhash, nonce, id);
+  //printf("difficulty is %i\n", diff);
   mine(nonce, diff, bhash); //nonce, difficulty, data
   write_nonce(nonce);
   //test_check_pow();

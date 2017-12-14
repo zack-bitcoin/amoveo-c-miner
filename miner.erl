@@ -1,14 +1,16 @@
 -module(miner).
 -export([start/0, unpack_mining_data/1]).
--define(Peer, "http://localhost:8081/").
+-define(Peer, "http://localhost:8085/").
 -define(CORES, 3).
 -define(mode, pool).
--define(Pubkey, <<"BHuqX6EKohvveqkcbyGgE247jQ5O0i2YKO27Yx50cXd+8J/dCVTnMz8QWUUS9L5oGWUx5CPtseeHddZcygmGVaM=">>).
+-define(Pubkey, <<"BHjaeLteq9drDIhp8d0R6JmUqkivIW1M0Yoh5rsGnw4wePMKowcNGHqfttAF52jMYhsZicFr7eIOWN/Sr0XI+OI=">>).
+-define(period, 6).%how long to wait in seconds before checking if new mining data is available.
+%This should probably be around 1/20th of the blocktime.
 
 
 start_many(N, _) when N < 1-> [];
 start_many(N, Me) -> 
-    Pid = spawn(fun() -> Me ! os:cmd("./amoveo_c_miner") end),
+    Pid = spawn(fun() -> Me ! os:cmd("./amoveo_c_miner " ++ integer_to_list(N)) end),
     [Pid|start_many(N-1, Me)].
 kill_os_mains() -> os:cmd("killall amoveo_c_miner").
 unpack_mining_data(R) ->
@@ -36,17 +38,22 @@ start_c_miners(R) ->
 %we write these bytes into a file, and then call the c program, and expect the c program to read the file.
 % when the c program terminates, we read the response from a different file.
     start_many(?CORES, self()),
-    receive _ -> ok end,
-    io:fwrite("Found a block.\n"),
+    
+    receive _ -> 
+            io:fwrite("Found a block. 1\n"),
+            {ok, <<Nonce:256>>} = file:read_file("nonce.txt"),
+            BinNonce = base64:encode(<<Nonce:256>>),
+            Data = << <<"[\"work\",\"">>/binary, BinNonce/binary, <<"\",\"">>/binary, ?Pubkey/binary, <<"\"]">>/binary>>,
+                                                %talk_helper2(Data, ?Peer),
+            talk_helper(Data, ?Peer, 40),%spend 8 seconds checking 5 times per second if we can start mining  again.
+            io:fwrite("Found a block. 2\n"),
+            timer:sleep(200)
+    after (?period * 1000) ->
+            io:fwrite("did not find a block in that period \n"),
+            ok
+    end,
     kill_os_mains(),
     flush(),
-    {ok, <<Nonce:256>>} = file:read_file("nonce.txt"),
-    BinNonce = base64:encode(<<Nonce:256>>),
-    Data = << <<"[\"work\",\"">>/binary, BinNonce/binary, <<"\",\"">>/binary, ?Pubkey/binary, <<"\"]">>/binary>>,
-    %talk_helper2(Data, ?Peer),
-    talk_helper(Data, ?Peer, 40),%spend 8 seconds checking 5 times per second if we can start mining  again.
-    io:fwrite("Found a block. 2\n"),
-    timer:sleep(200),
     start2().
 talk_helper2(Data, Peer) ->
     httpc:request(post, {Peer, [], "application/octet-stream", iolist_to_binary(Data)}, [{timeout, 3000}], []).
