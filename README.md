@@ -7,6 +7,7 @@ You can connect it to a full node. Change the url at the top of miner.erl to poi
 
 You can also connect to a mining pool. If you connect to a mining pool, you get paid by the person running the pool.
 This way you don't have to run Amoveo.
+set `Peer` to be the url for the mining pool.
 Put your pubkey into the `Pubkey` definition at the top of miner.erl so that you can get paid.
 
 [Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo) If you want to run a mining pool, or solo mine, you will need this.
