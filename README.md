@@ -3,10 +3,15 @@ Amoveo C miner
 
 This is the best miner for Amoveo currently available.
 
-It expects that you are running a full node of Amoveo using port 8080, which is the default port.
-[Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo)
+You can connect it to a full node. Change the url at the top of miner.erl to point to your full node. It is named `Peer`. This gives all your money to whoever runs that full node.
 
-On ubuntu, it can be compiled and turned on like this: 
+You can also connect to a mining pool. If you connect to a mining pool, you get paid by the person running the pool.
+This way you don't have to run Amoveo.
+Put your pubkey into the `Pubkey` definition at the top of miner.erl so that you can get paid.
+
+[Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo) If you want to run a mining pool, or solo mine, you will need this.
+
+On ubuntu, the miner in C language can be compiled and turned on like this: 
 ```
 sh build_ubuntu.sh 
 ```
