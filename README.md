@@ -8,9 +8,10 @@ You can connect it to a full node. Change the url at the top of miner.erl to poi
 You can also connect to a mining pool. If you connect to a mining pool, you get paid by the person running the pool.
 This way you don't have to run Amoveo.
 set `Peer` to be the url for the mining pool.
-Put your pubkey into the `Pubkey` definition at the top of miner.erl so that you can get paid.
 
-[Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo) If you want to run a mining pool, or solo mine, you will need this.
+By default `Peer` is set up to connect to a public mining pool.
+
+Put your pubkey into the `Pubkey` definition at the top of miner.erl so that you can get paid.
 
 On ubuntu, the miner in C language can be compiled and turned on like this: 
 ```
@@ -37,3 +38,5 @@ By writing a miner for Amoveo in C, it becomes easier to write miners for the GP
 This simple C miner is a template for making miners in other languages.
 
 [Here is a link to where the same mining is implemented in erlang. The 'pow' function is the one to look at](https://github.com/BumblebeeBat/pink_crypto)
+
+[Here is a link to the main Amoveo repo.](https://github.com/zack-bitcoin/amoveo). If you want to solo mine without a mining pool, you will need this. Solo miners make more profit.

@@ -1,3 +1,8 @@
+Calculating hash2integer on every loop of the mining cycle is a terrible design.
+Instead we should use the difficulty to calculate the highest hash we would accept, and then compare everything against this hash.
+
+
+
 I suspect hash2integer() could be rewritten as one or two lines of code, but I don't fully understand what is supposed to do, or why the loop is short by one. It wouldn't kill you to write some comments...
 
 From a performance perspective, there is a lot of duplicated work here — buffers that are reinitialized to the same value for every hash attempt, etc. If you were serious about this, you would inline the sha256 implementation and strip it down to the bare minimum you need, removing all loops and conditionals. You can prefill a 128-byte buffer with the data, difficulty, length and padding and only change the nonce. Even better, you can place the data in the first half and the nonce and difficulty in the second and save the sha256 state after the first half instead of re-hashing the same data every time, and you can integrate the logic of hash2integer() into sha256_final().
