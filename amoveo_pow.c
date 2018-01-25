@@ -110,10 +110,10 @@ int read_input(BYTE B[32], BYTE N[32], WORD id) {
   rewind(fileptr); 
   fread(B, 32, 1, fileptr);
   fread(N, 32, 1, fileptr);
-  N[0] = id % 256;
-  N[1] = (id / 256) % 256;
-  N[2] = ((id / 256) / 256) % 256;
-  N[3] = (((id / 256) / 256) / 256) % 256;
+  N[28] = id % 256;
+  N[29] = (id / 256) % 256;
+  N[30] = ((id / 256) / 256) % 256;
+  N[31] = (((id / 256) / 256) / 256) % 256;
   BYTE buffer[10] = { 0 };
   fread(buffer, filelen-64, 1, fileptr);
   int diff = 0;
