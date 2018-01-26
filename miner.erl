@@ -1,12 +1,12 @@
 -module(miner)
 .
 -export([start/0, unpack_mining_data/1]).
--define(Peer, "http://localhost:8081/").%for a full node on same computer.
+%-define(Peer, "http://localhost:8081/").%for a full node on same computer.
 %-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
-%-define(Peer, "http://146.185.142.103:8085/").%for a mining pool on the server.
+-define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
 -define(CORES, 2).
 -define(mode, pool).
--define(Pubkey, <<"BHjaeLteq9drDIhp8d0R6JmUqkivIW1M0Yoh5rsGnw4wePMKowcNGHqfttAF52jMYhsZicFr7eIOWN/Sr0XI+OI=">>).
+-define(Pubkey, <<"BCkTCrckcnDC5V4pvLkucYJtTwobYaOJ5JHRFp2MzC9OluoaSDYbHfp5mDWh0mLu4j+SugCCx+zp2RSfrSZTK+o=">>).
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
 %This should probably be around 1/20th of the blocktime.
