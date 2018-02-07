@@ -3,6 +3,8 @@ Amoveo C miner
 
 This is the best miner for Amoveo currently available.
 
+[First, if you haven't installed the dependencies, do that here.](https://github.com/zack-bitcoin/amoveo/blob/master/docs/getting-started/dependencies.md)
+
 You can connect it to a full node. Change the url at the top of miner.erl to point to your full node. It is named `Peer`. This gives all your money to whoever runs that full node.
 
 You can also connect to a mining pool. If you connect to a mining pool, you get paid by the person running the pool.
