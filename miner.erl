@@ -56,9 +56,7 @@ speed_test() ->
     Third = <<0>>,
     F = <<0:256>>,
     RS = F,
-    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),
-    start_many(1, self()).
-    
+    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>).
     
 start_c_miners(R) ->
     {F, _, Third} = unpack_mining_data(R), %S is the nonce
