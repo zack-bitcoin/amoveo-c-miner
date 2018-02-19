@@ -50,6 +50,10 @@ You can do a speed test to measure how fast your computer is able to mine. First
 ```
 sh build_ubuntu.sh
 ```
+Then change the settings to be in speed-test mode.
+```
+miner:speed_test().
+```
 then quit from erlang
 ```
 halt().
