@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -90,6 +91,12 @@ BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
     nonce = next_nonce(nonce);
   }
 }
+void mine_test(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  for (int i = 0; i < 1000000; i++) {
+    check_pow(nonce, 10000, data);
+    nonce = next_nonce(nonce);
+  }
+}
 void write_nonce(BYTE x[32]) {
   FILE *f = fopen("nonce.txt", "w");
   if (f == NULL) {
@@ -142,6 +149,16 @@ int main(int argc, char *argv[])
   //printf("argc is %i\n", argc);
   //printf("id is %i\n", id);
   int diff = read_input(bhash, nonce, id);
+  if (diff < 10) {
+    printf("speed test starting\n");
+    clock_t begin = clock();
+    mine_test(nonce, diff, bhash);/* here, do your time-consuming job */
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    double speed = 1 / time_spent;
+    printf("speed result: %f megahashes per second per CPU\n", speed);
+    return(0);
+  } 
   printf("difficulty is %i\n", diff);
   mine(nonce, diff, bhash); //nonce, difficulty, data
   write_nonce(nonce);

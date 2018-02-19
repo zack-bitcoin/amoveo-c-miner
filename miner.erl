@@ -1,12 +1,12 @@
 -module(miner)
 .
--export([start/0, unpack_mining_data/1]).
+-export([start/0, unpack_mining_data/1, speed_test/0]).
 %-define(Peer, "http://localhost:8081/").%for a full node on same computer.
 %-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
 -define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
 -define(CORES, 2).
 -define(mode, pool).
--define(Pubkey, <<"BCkTCrckcnDC5V4pvLkucYJtTwobYaOJ5JHRFp2MzC9OluoaSDYbHfp5mDWh0mLu4j+SugCCx+zp2RSfrSZTK+o=">>).
+-define(Pubkey, <<"BMjV7rAAssU+DGd8w+6XsyDSdgoichddlSipZT3U+jehHSD68UwPdF9TO3HQ0g4hCh2rgUQyqPnP7vP0i/l8Ijw=">>).
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
 %This should probably be around 1/20th of the blocktime.
@@ -38,6 +38,9 @@ start2() ->
     start_c_miners(R).
 read_nonce(0) -> 0;
 read_nonce(N) ->
+    io:fwrite("read nonce n is "),
+    io:fwrite(integer_to_list(N)),
+    io:fwrite("\n"),
     case file:read_file("nonce.txt") of
 	{ok, <<Nonce:256>>} -> Nonce;
 	{ok, <<>>} -> 
@@ -48,7 +51,15 @@ read_nonce(N) ->
 	    read_nonce(N-1)
     end.
 
-	    
+	   
+speed_test() -> 
+    Third = <<0>>,
+    F = <<0:256>>,
+    RS = F,
+    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),
+    start_many(1, self()).
+    
+    
 start_c_miners(R) ->
     {F, _, Third} = unpack_mining_data(R), %S is the nonce
     RS = crypto:strong_rand_bytes(32),
@@ -56,16 +67,21 @@ start_c_miners(R) ->
     file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),
 %we write these bytes into a file, and then call the c program, and expect the c program to read the file.
 % when the c program terminates, we read the response from a different file.
+    flush(),
     start_many(?CORES, self()),
     receive _ -> 
 	    kill_os_mains(),
             io:fwrite("Found a block. 1\n"),
-	    Nonce = read_nonce(5),
-            BinNonce = base64:encode(<<Nonce:256>>),
-            Data = << <<"[\"work\",\"">>/binary, BinNonce/binary, <<"\",\"">>/binary, ?Pubkey/binary, <<"\"]">>/binary>>,
-            talk_helper(Data, ?Peer, 5),
-            io:fwrite("Found a block. 2\n"),
-            timer:sleep(200)
+	    Nonce = read_nonce(2),
+	    case Nonce of 
+		0 -> io:fwrite("nonce 0 error\n");
+		_ ->
+		    BinNonce = base64:encode(<<Nonce:256>>),
+		    Data = << <<"[\"work\",\"">>/binary, BinNonce/binary, <<"\",\"">>/binary, ?Pubkey/binary, <<"\"]">>/binary>>,
+		    talk_helper(Data, ?Peer, 5),
+		    io:fwrite("Found a block. 2\n"),
+		    timer:sleep(200)
+	    end
     after (?period * 1000) ->
 	    kill_os_mains(),
             io:fwrite("did not find a block in that period \n"),
@@ -102,9 +118,7 @@ slice(Bin, Char, N) ->
     end.
 flush() ->
     receive
-        _ ->
-            flush()
+        _ -> flush()
     after
-        0 ->
-            ok
+        0 -> ok
     end.
