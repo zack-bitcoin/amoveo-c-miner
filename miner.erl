@@ -5,7 +5,6 @@
 %-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
 -define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
 -define(CORES, 2).
--define(mode, pool).
 -define(Pubkey, <<"BMjV7rAAssU+DGd8w+6XsyDSdgoichddlSipZT3U+jehHSD68UwPdF9TO3HQ0g4hCh2rgUQyqPnP7vP0i/l8Ijw=">>).
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
@@ -16,7 +15,7 @@ start_many(N, _) when N < 1-> [];
 start_many(N, Me) -> 
     Pid = spawn(fun() -> Me ! os:cmd("./amoveo_c_miner " ++ integer_to_list(N)) end),
     [Pid|start_many(N-1, Me)].
-kill_os_mains() -> os:cmd("killall amoveo_c_miner").
+kill_os_mains() -> os:cmd("pkill amoveo_c_miner").
 unpack_mining_data(R) ->
     <<_:(8*11), R2/binary>> = list_to_binary(R),
     {First, R3} = slice(R2, hd("\"")),

@@ -1,1 +1,2 @@
-killall amoveo_c_miner
+#killall amoveo_c_miner
+pkill amoveo_c_miner
