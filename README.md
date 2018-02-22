@@ -5,6 +5,12 @@ This is the best miner for Amoveo currently available.
 
 [First, if you haven't installed the dependencies, do that here.](https://github.com/zack-bitcoin/amoveo/blob/master/docs/getting-started/dependencies.md)
 
+## installation
+```
+git clone https://github.com/zack-bitcoin/amoveo-c-miner.git
+```
+
+
 ## configure
 
 You can connect it to a full node. Change the url at the top of miner.erl to point to your full node. It is named `Peer`. This gives all your money to whoever runs that full node.
@@ -17,10 +23,10 @@ By default `Peer` is set up to connect to a public mining pool.
 
 Put your pubkey into the `Pubkey` definition at the top of miner.erl so that you can get paid. 
 
-By default it uses 3 threads for mining. To change this, change the line near the top of `miner.erl`
-It says `-define(CORES, 3).`
+By default it uses 2 threads for mining. To change this, change the line near the top of `miner.erl`
+It says `-define(CORES, 2).`
 
-Change the 3 to the number of threads that you want to mine with. Usually, this should be the same as, or one less than the number of CPU cores on your computer.
+Change the 2 to the number of threads that you want to mine with. Usually, this should be the same as, or one less than the number of CPU cores on your computer.
 
 
 
