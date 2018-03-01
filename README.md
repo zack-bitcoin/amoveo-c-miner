@@ -71,7 +71,7 @@ now run the c program alone
 
 ## other notes
 
-[The build.sh install script works for ubuntu linux](build_ubuntu.sh). If you are using a different system, you will have to make some simple changes.
+[The build.sh install script works for Ubuntu and Arch linux](build_ubuntu.sh). If you are using a different system, you may need to make some simple changes.
 
 By writing a miner for Amoveo in C, it becomes easier to write miners for the GPU and FPGAs.
 This simple C miner is a template for making miners in other languages.
