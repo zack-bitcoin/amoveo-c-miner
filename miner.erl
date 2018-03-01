@@ -34,7 +34,13 @@ start2() ->
     flush(),
     Data = <<"[\"mining_data\"]">>,
     R = talk_helper(Data, ?Peer, 1000),
-    start_c_miners(R).
+    if
+	is_list(R) ->
+	    start_c_miners(R);
+	is_atom(R) -> 
+	    timer:sleep(1000),
+	    start()
+    end.
 read_nonce(0) -> 0;
 read_nonce(N) ->
     io:fwrite("read nonce n is "),
@@ -61,7 +67,7 @@ start_c_miners(R) ->
     {F, _, Third} = unpack_mining_data(R), %S is the nonce
     RS = crypto:strong_rand_bytes(32),
     ok = file:write_file("nonce.txt", <<"">>),
-    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),
+    file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),%32 byte hash, 32 byte nonce, integer
 %we write these bytes into a file, and then call the c program, and expect the c program to read the file.
 % when the c program terminates, we read the response from a different file.
     flush(),
@@ -87,7 +93,7 @@ start_c_miners(R) ->
     start2().
 talk_helper2(Data, Peer) ->
     httpc:request(post, {Peer, [], "application/octet-stream", iolist_to_binary(Data)}, [{timeout, 3000}], []).
-talk_helper(_Data, _Peer, 0) -> ok;
+talk_helper(_Data, _Peer, 0) -> throw("talk helper failed");
 talk_helper(Data, Peer, N) ->
     case talk_helper2(Data, Peer) of
         {ok, {_Status, _Headers, []}} ->

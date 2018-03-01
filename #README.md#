@@ -1,8 +1,6 @@
 Amoveo C miner
 =============
 
-This is the best miner for Amoveo currently available.
-
 [First, if you haven't installed the dependencies, do that here.](https://github.com/zack-bitcoin/amoveo/blob/master/docs/getting-started/dependencies.md)
 
 ## installation
@@ -34,7 +32,7 @@ Change the 2 to the number of threads that you want to mine with. Usually, this 
 
 On ubuntu, the miner in C language can be compiled and turned on like this: 
 ```
-sh build.sh 
+sh build_ubuntu.sh 
 ```
 Then you start mining like this:
 ```
@@ -54,7 +52,7 @@ sh clean.sh
 
 You can do a speed test to measure how fast your computer is able to mine. First build the software normally
 ```
-sh build.sh
+sh build_ubuntu.sh
 ```
 Then change the settings to be in speed-test mode.
 ```
@@ -71,7 +69,7 @@ now run the c program alone
 
 ## other notes
 
-[The build.sh install script works for ubuntu linux and Mac OSX](build.sh). If you are using a different system, you will have to make some simple changes.
+[The build.sh install script works for ubuntu linux](build_ubuntu.sh). If you are using a different system, you will have to make some simple changes.
 
 By writing a miner for Amoveo in C, it becomes easier to write miners for the GPU and FPGAs.
 This simple C miner is a template for making miners in other languages.
