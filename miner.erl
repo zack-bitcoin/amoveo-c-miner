@@ -5,7 +5,7 @@
 %-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
 -define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
 -define(CORES, 2).
--define(Pubkey, <<"BMjV7rAAssU+DGd8w+6XsyDSdgoichddlSipZT3U+jehHSD68UwPdF9TO3HQ0g4hCh2rgUQyqPnP7vP0i/l8Ijw=">>).
+-define(Pubkey, <<"BMjV7rAAssU+DGd8w+6XsyDSdgoichddlSipZT3U+jehHSD68UwPdF9TO3HQ0g4hCh2rgUQyqPnP7vP0i/l8Ijw=">>). %If you are using a full node on the same computer, then it does not use this pubkey. Instead it uses the pubkey stored in the full node. 
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
 -define(miner_sleep, 0). %This is how you reduce the load on CPU. It sleeps this long in miliseconds between mining cycles.
