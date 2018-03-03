@@ -20,7 +20,7 @@ pip-selfcheck.json
 config/*/sys.config
 man
 compile_commands.json
-.beam
+*.beam
 mining_input
 nonce.txt
 amoveo_c_miner
