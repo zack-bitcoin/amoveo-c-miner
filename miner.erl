@@ -8,7 +8,7 @@
 -define(Pubkey, <<"BMjV7rAAssU+DGd8w+6XsyDSdgoichddlSipZT3U+jehHSD68UwPdF9TO3HQ0g4hCh2rgUQyqPnP7vP0i/l8Ijw=">>).
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
-%This should probably be around 1/20th of the blocktime.
+-define(miner_sleep, 0). %This is how you reduce the load on CPU. It sleeps this long in miliseconds between mining cycles.
 
 
 start_many(N, _) when N < 1-> [];
@@ -90,6 +90,7 @@ start_c_miners(R) ->
             io:fwrite("did not find a block in that period \n"),
             ok
     end,
+    timer:sleep(?miner_sleep),
     start2().
 talk_helper2(Data, Peer) ->
     httpc:request(post, {Peer, [], "application/octet-stream", iolist_to_binary(Data)}, [{timeout, 3000}], []).

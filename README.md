@@ -28,6 +28,8 @@ It says `-define(CORES, 2).`
 
 Change the 2 to the number of threads that you want to mine with. Usually, this should be the same as, or one less than the number of CPU cores on your computer.
 
+You can tell it to sleep in between mining periods so that you consume less CPU for mining.
+
 
 
 ## mining
