@@ -55,7 +55,15 @@ Then to kill the miner processes, do:
 sh clean.sh
 ```
 
-
+On windows, you'll need [Visual Studio Community 2017](https://www.visualstudio.com/downloads/). To compile the miner, you have to run the Visual Studio and open `Tools > Visual Studio Command Prompt`. Then within the command prompt:
+```
+cd <miner_repo_path>
+build.bat
+```
+Then, just like on ubuntu, start miner by:
+```
+miner:start().
+```
 
 
 
