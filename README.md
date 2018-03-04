@@ -3,7 +3,14 @@ Amoveo C miner
 
 This is the best miner for Amoveo currently available.
 
-[First, if you haven't installed the dependencies, do that here.](https://github.com/zack-bitcoin/amoveo/blob/master/docs/getting-started/dependencies.md)
+
+## Dependencies
+```
+   sudo apt-get install erlang libncurses5-dev libssl-dev unixodbc-dev g++ git
+```
+You might need less than what is listed above ^
+[If you still have trouble with dependencies, look at dependencies from Amoveo: ](https://github.com/zack-bitcoin/amoveo/blob/master/docs/getting-started/dependencies.md)
+
 
 ## installation
 ```
