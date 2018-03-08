@@ -84,6 +84,110 @@ static BYTE* next_nonce(BYTE nonce[32]){
   }
   return(0);
 }
+static BYTE* fast_next_nonce(BYTE nonce[10]) {
+  for (int i = 0; i < 10; i++) {
+    if (nonce[i] == 255) {
+      nonce[i] = 0;
+    } else {
+      nonce[i] += 1;
+      return nonce;
+    }
+  }
+  return(0);
+}
+BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  BYTE text[56];//32+2+32-10
+  for (int i = 0; i < 32; i++) 
+    text[i] = data[i];
+  text[32] = difficulty / 256;
+  text[33] = difficulty % 256;
+  for (int i = 0; i < 22; i++) //10 bytes left
+    text[i+34] = nonce[i];
+  SHA256_CTX ctx;
+  sha256_init(&ctx);
+  sha256_update(&ctx, text, 56);
+  BYTE nonce2[10];
+  for (int i = 0; i < 10; i++) 
+    nonce2[i] = nonce[22+i];
+  while(1) {
+    SHA256_CTX ctx2;
+    ctx2 = ctx;
+    sha256_update(&ctx2, nonce2, 10);
+    BYTE buf[32];
+    sha256_final(&ctx2, buf);
+    int i = hash2integer(buf);
+    if (i > difficulty)
+      for (int j = 0; j < 10; j++)
+	nonce[22+j] = nonce2[j];
+      return nonce;
+    fast_next_nonce(nonce2);
+  }
+}
+void fast_mine_test(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  BYTE text[56];//32+2+32-10
+  for (int i = 0; i < 32; i++) 
+    text[i] = data[i];
+  text[32] = difficulty / 256;
+  text[33] = difficulty % 256;
+  for (int i = 0; i < 22; i++) //11 bytes left
+    text[i+34] = nonce[i];
+  SHA256_CTX ctx;
+  sha256_init(&ctx);
+  sha256_update(&ctx, text, 56);
+  BYTE nonce2[10];
+  for (int i = 0; i < 10; i++) 
+    nonce2[i] = nonce[22+i];
+  //while(1) {
+  for (int j = 0; j < 1000000; j++) {
+    SHA256_CTX ctx2;
+    ctx2 = ctx;
+    sha256_update(&ctx2, nonce2, 10);
+    BYTE buf[32];
+    sha256_final(&ctx2, buf);
+    int i = hash2integer(buf);
+    fast_next_nonce(nonce2);
+  }
+}
+BYTE* partial_hash_test(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  BYTE text[56];//32+2+32-10
+  for (int i = 0; i < 32; i++) 
+    text[i] = data[i];
+  text[32] = difficulty / 256;
+  text[33] = difficulty % 256;
+  for (int i = 0; i < 22; i++) //11 bytes left
+    text[i+34] = nonce[i];
+  SHA256_CTX ctx;
+  sha256_init(&ctx);
+  sha256_update(&ctx, text, 56);
+  SHA256_CTX ctx3;
+  ctx3 = ctx;
+  BYTE text2[10];
+  for (int i = 0; i < 10; i++) 
+    text2[i] = 0;
+  sha256_update(&ctx3, text2, 10);
+  BYTE buf[32];
+  sha256_final(&ctx3, buf);
+  printf("%i, %i, %i, %i, %i, %i, %i, %i, \n",
+         buf[0], buf[1], buf[2], buf[3],
+         buf[4], buf[5], buf[6], buf[7]);
+
+  BYTE text3[66];
+  for (int i = 0; i < 56; i++)
+    text3[i] = text[i];
+  for (int i = 0; i < 10; i++)
+    text3[56+i] = 0;
+  SHA256_CTX ctx2;
+  sha256_init(&ctx2);
+  sha256_update(&ctx2, text3, 66);
+  BYTE buf2[32];
+  sha256_final(&ctx2, buf2);
+  printf("%i, %i, %i, %i, %i, %i, %i, %i, \n",
+         buf2[0], buf2[1], buf2[2], buf2[3],
+         buf2[4], buf2[5], buf2[6], buf2[7]);
+
+  return 0;
+}
+
 BYTE* mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   while (1) {
     if (check_pow(nonce, difficulty, data)) 
@@ -152,7 +256,7 @@ int main(int argc, char *argv[])
   if (diff < 10) {
     printf("speed test starting\n");
     clock_t begin = clock();
-    mine_test(nonce, diff, bhash);/* here, do your time-consuming job */
+    fast_mine_test(nonce, diff, bhash);/* here, do your time-consuming job */
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     double speed = 1 / time_spent;
@@ -160,8 +264,12 @@ int main(int argc, char *argv[])
     return(0);
   } 
   printf("difficulty is %i\n", diff);
-  mine(nonce, diff, bhash); //nonce, difficulty, data
+  //mine(nonce, diff, bhash);
+  fast_mine(nonce, diff, bhash); //nonce, difficulty, data
+  //partial_hash_test(nonce, diff, bhash);
   write_nonce(nonce);
+
+  //fast_mine_test(nonce, diff, bhash);
   //test_check_pow();
   //test_hash();
   //test_hash2integer();
