@@ -95,49 +95,46 @@ static BYTE* fast_next_nonce(BYTE nonce[10]) {
   }
   return(0);
 }
-BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
-//This implentation optimises sha256, for the mining data.	
-// It takes 66 bytes of mining data, and returns the nonce if it satisfies the difficulty target.	
-  BYTE chunk1[64];
-  BYTE chunk2[2];
-  int i,j,k,work;
 
-  for (i = 0; i < 32; i++) 
+
+BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
+  BYTE chunk1[64], chunk2[2], buf[32];
+  int i,j,k,work;
+  SHA256_CTX ctx, temp_ctx;
+
+  for (i = 0; i < 32; i++)
     chunk1[i] = data[i];
   chunk1[32] = difficulty / 256;
   chunk1[33] = difficulty % 256;
-  for (i = 0; i < 30; i++) 
-    chunk1[i+34] = nonce[i];
-  SHA256_CTX ctx;
-  WORD state[8]; 
-  BYTE buf[32]; 
+  for (i = 0; i < 30; i++)
+    chunk1[i+34] = nonce[i]; 
   while(1) {
     sha256_init(&ctx);
     sha256_update(&ctx, chunk1, 64);
-  
-    for(k = 0; k < 8; k++)   // save state of ctx
-      state[k] = ctx.state[k];   
+    temp_ctx = ctx; 
     for(i = 0; i < 256; i++) {
-      for(j = 0; j < 256; j++) { 
+      for(j = 0; j < 256; j++) {
         chunk2[0] = i;
         chunk2[1] = j;
         sha256_update(&ctx,chunk2, 2);
-        sha256_final(&ctx,buf); 
+        sha256_final(&ctx,buf);
         int work = hash2integer(buf);
         if (work > difficulty) {
           nonce[30] = i;
-          nonce[31] =j;
+          nonce[31] = j;
+          for(i=0;i<30;i++)
+            nonce[i]=chunk1[34+i];
           return nonce;
         }
+      ctx = temp_ctx;
       } // end for loop
-     for (k = 0; k < 8; k++)
-       ctx.state[k] = state[k]; //restore state of ctx
+
     } // end i loop
-    for (int i = 0; i < 8; i++) {
-      if (chunk1[55+ i] == 255) {
-        chunk1[i] = 0;
+    for (int i = 0; i < 9; i++) {
+      if (chunk1[54 + i] == 255) {
+        chunk1[54 + i] = 0;
       } else {
-          chunk1[i] += 1;
+          chunk1[54+i] += 1;
           break;
         }
     } // end for
