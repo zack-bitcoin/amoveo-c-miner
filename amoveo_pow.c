@@ -112,7 +112,7 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   BYTE buf[32]; 
   while(1) {
     sha256_init(&ctx);
-    sha256_update(&ctx, chunk1);
+    sha256_update(&ctx, chunk1, 64);
   
     for(k = 0; k < 8; k++)   // save state of ctx
       state[k] = ctx.state[k];   
@@ -120,7 +120,7 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
       for(j = 0; j < 256; j++) { 
         chunk2[0] = i;
         chunk2[1] = j;
-        sha256_update(&ctx,chunk2);
+        sha256_update(&ctx,chunk2, 2);
         sha256_final(&ctx,buf); 
         int work = hash2integer(buf);
         if (work > difficulty) {
