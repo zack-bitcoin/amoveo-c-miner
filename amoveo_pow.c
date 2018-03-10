@@ -98,46 +98,49 @@ static BYTE* fast_next_nonce(BYTE nonce[10]) {
 
 
 BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
-  BYTE chunk1[64], chunk2[2], buf[32];
-  int i,j,k,work;
-  SHA256_CTX ctx, temp_ctx;
+  BYTE c1[64], c2[64]={0}, buf[32];
+  int i,j,k,work,count=0;
+  SHA256_CTX ctx, temp_ctx;  
+  int seed = time(NULL);
 
-  for (i = 0; i < 32; i++)
-    chunk1[i] = data[i];
-  chunk1[32] = difficulty / 256;
-  chunk1[33] = difficulty % 256;
-  for (i = 0; i < 30; i++)
-    chunk1[i+34] = nonce[i]; 
+  
+  srand(seed);
+  for (i = 0; i < 32; i++) {
+    c1[i] = data[i];
+    nonce[i]=rand()%256;
+  }   
+  c1[32] = difficulty / 256;
+  c1[33] = difficulty % 256;
+  c2[2]=0x80;
+  c2[62]=0x02;
+  c2[63]=0x10;
+  clock_t begin = clock();
   while(1) {
+    for (i = 0; i < 30; i++)
+      c1[i+34] = nonce[i];
     sha256_init(&ctx);
-    sha256_update(&ctx, chunk1, 64);
+    sha256_transform(&ctx, c1);
     temp_ctx = ctx; 
-    for(i = 0; i < 256; i++) {
-      for(j = 0; j < 256; j++) {
-        chunk2[0] = i;
-        chunk2[1] = j;
-        sha256_update(&ctx,chunk2, 2);
-        sha256_final(&ctx,buf);
-        int work = hash2integer(buf);
+    for(i = 0; i < 65536; i++) {
+        count++;
+        sha256_transform(&ctx,c2);
+        sha256_digest(&ctx,buf);
+        work = hash2integer(buf);
         if (work > difficulty) {
-          nonce[30] = i;
-          nonce[31] = j;
-          for(i=0;i<30;i++)
-            nonce[i]=chunk1[34+i];
+          nonce[30]=c2[0];
+          nonce[31]=c2[1];
+          clock_t end = clock();
+          double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+          double speed = 1 / time_spent;
+          printf("speed result: %f megahashes per second per CPU\n", speed*count/1000000);
           return nonce;
         }
-      ctx = temp_ctx;
-      } // end for loop
-
-    } // end i loop
-    for (int i = 0; i < 9; i++) {
-      if (chunk1[54 + i] == 255) {
-        chunk1[54 + i] = 0;
-      } else {
-          chunk1[54+i] += 1;
-          break;
-        }
-    } // end for
+    c2[0]=i/256;
+    c2[1]=i%256; 
+    ctx=temp_ctx;
+    } // end for loop
+    nonce=next_nonce(nonce);
+   
   } // end while(1)  
 }
 
