@@ -96,33 +96,49 @@ static BYTE* fast_next_nonce(BYTE nonce[10]) {
   return(0);
 }
 BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
-  BYTE text[56];//32+2+32-10
-  for (int i = 0; i < 32; i++) 
-    text[i] = data[i];
-  text[32] = difficulty / 256;
-  text[33] = difficulty % 256;
-  for (int i = 0; i < 22; i++) //10 bytes left
-    text[i+34] = nonce[i];
+//This implentation optimises sha256, for the mining data.	
+// It takes 66 bytes of mining data, and returns the nonce if it satisfies the difficulty target.	
+  BYTE chunk1[64];
+  int i,j,k,work;
+
+  for (i = 0; i < 32; i++) 
+    chunk1[i] = data[i];
+  chunk1[32] = difficulty / 256;
+  chunk1[33] = difficulty % 256;
+  for (i = 0; i < 30; i++) 
+    chunk1[i+34] = nonce[i];
+
   SHA256_CTX ctx;
+  WORD state[8]; 
+  BYTE chunk2[64]={0};
+  chunk2[55] = 0x80;  // append bit value value 1  final chunk as per sha256 specification, 
+  chunk2[63] = 0x10; //  length of second chunk = 2 bytes = 16bits 
+  BYTE buf[32]; 
+
   sha256_init(&ctx);
-  sha256_update(&ctx, text, 56);
-  BYTE nonce2[10];
-  for (int i = 0; i < 10; i++) 
-    nonce2[i] = nonce[22+i];
-  while(1) {
-    SHA256_CTX ctx2;
-    ctx2 = ctx;
-    sha256_update(&ctx2, nonce2, 10);
-    BYTE buf[32];
-    sha256_final(&ctx2, buf);
-    int i = hash2integer(buf);
-    if (i > difficulty)
-      for (int j = 0; j < 10; j++)
-	nonce[22+j] = nonce2[j];
-      return nonce;
-    fast_next_nonce(nonce2);
+  sha256_transform(&ctx, chunk1);
+  for(k = 0; k < 8; k++)   // save state of ctx
+    state[k] = ctx.state[k];   
+  for(i = 0; i < 256; i++) {
+    for(j = 0; j < 256; j++) { 
+      chunk2[0] = i;
+      chunk2[1] = j;
+      sha256_transform(&ctx,chunk2);
+      sha256_digest(&ctx,buf); 
+// you can probably test buf for first two leading zeros, to avoid many calls to hash2integer.   
+      int work = hash2integer(buf);
+      if (work > difficulty) {
+        nonce[30] = i;
+        nonce[31] =j;
+        return nonce;
+      }
+    }
+   for (k = 0; k < 8; k++)
+     ctx.state[k] = state[k]; //restore state of ctx
   }
 }
+
+
 void fast_mine_test(BYTE nonce[32], int difficulty, BYTE data[32]) {
   BYTE text[56];//32+2+32-10
   for (int i = 0; i < 32; i++) 
