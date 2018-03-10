@@ -111,7 +111,7 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   SHA256_CTX ctx;
   WORD state[8]; 
   BYTE chunk2[64]={0};
-  chunk2[55] = 0x80;  // append bit value value 1  final chunk as per sha256 specification, 
+  chunk2[3] = 0x80;  // append bit value value 1  final chunk as per sha256 specification, 
   chunk2[63] = 0x10; //  length of second chunk = 2 bytes = 16bits 
   BYTE buf[32]; 
 
