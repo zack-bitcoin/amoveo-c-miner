@@ -107,35 +107,40 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
   chunk1[33] = difficulty % 256;
   for (i = 0; i < 30; i++) 
     chunk1[i+34] = nonce[i];
-
   SHA256_CTX ctx;
   WORD state[8]; 
-  BYTE chunk2[64]={0};
-  chunk2[3] = 0x80;  // append bit value value 1  final chunk as per sha256 specification, 
-  chunk2[63] = 0x10; //  length of second chunk = 2 bytes = 16bits 
   BYTE buf[32]; 
-
-  sha256_init(&ctx);
-  sha256_transform(&ctx, chunk1);
-  for(k = 0; k < 8; k++)   // save state of ctx
-    state[k] = ctx.state[k];   
-  for(i = 0; i < 256; i++) {
-    for(j = 0; j < 256; j++) { 
-      chunk2[0] = i;
-      chunk2[1] = j;
-      sha256_transform(&ctx,chunk2);
-      sha256_digest(&ctx,buf); 
-// you can probably test buf for first two leading zeros, to avoid many calls to hash2integer.   
-      int work = hash2integer(buf);
-      if (work > difficulty) {
-        nonce[30] = i;
-        nonce[31] =j;
-        return nonce;
-      }
-    }
-   for (k = 0; k < 8; k++)
-     ctx.state[k] = state[k]; //restore state of ctx
-  }
+  while(1) {
+    sha256_init(&ctx);
+    sha256_update(&ctx, chunk1);
+  
+    for(k = 0; k < 8; k++)   // save state of ctx
+      state[k] = ctx.state[k];   
+    for(i = 0; i < 256; i++) {
+      for(j = 0; j < 256; j++) { 
+        chunk2[0] = i;
+        chunk2[1] = j;
+        sha256_update(&ctx,chunk2);
+        sha256_final(&ctx,buf); 
+        int work = hash2integer(buf);
+        if (work > difficulty) {
+          nonce[30] = i;
+          nonce[31] =j;
+          return nonce;
+        }
+      } // end for loop
+     for (k = 0; k < 8; k++)
+       ctx.state[k] = state[k]; //restore state of ctx
+    } // end i loop
+    for (int i = 0; i < 10; i++) {
+      if (chunk1[55+ i] == 255) {
+        chunk1[i] = 0;
+      } else {
+          chunk[i] += 1;
+          break;
+        }
+    } // end for
+  } // end while(1)  
 }
 
 
