@@ -99,6 +99,7 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
 //This implentation optimises sha256, for the mining data.	
 // It takes 66 bytes of mining data, and returns the nonce if it satisfies the difficulty target.	
   BYTE chunk1[64];
+  BYTE chunk2[2];
   int i,j,k,work;
 
   for (i = 0; i < 32; i++) 
@@ -132,11 +133,11 @@ BYTE* fast_mine(BYTE nonce[32], int difficulty, BYTE data[32]) {
      for (k = 0; k < 8; k++)
        ctx.state[k] = state[k]; //restore state of ctx
     } // end i loop
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 8; i++) {
       if (chunk1[55+ i] == 255) {
         chunk1[i] = 0;
       } else {
-          chunk[i] += 1;
+          chunk1[i] += 1;
           break;
         }
     } // end for
