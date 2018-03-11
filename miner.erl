@@ -1,10 +1,10 @@
 -module(miner)
 .
 -export([start/0, unpack_mining_data/1, speed_test/0]).
-%-define(Peer, "http://localhost:3011/").%for a full node on same computer.
+-define(Peer, "http://localhost:3011/").%for a full node on same computer.
 %-define(Peer, "http://localhost:8081/").%for a full node on same computer.
 %-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
--define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
+%-define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
 -define(CORES, 2).
 -define(Pubkey, <<"BCjdlkTKyFh7BBx4grLUGFJCedmzo4e0XT1KJtbSwq5vCJHrPltHATB+maZ+Pncjnfvt9CsCcI9Rn1vO+fPLIV4=">>). %If you are using a full node on the same computer, then it does not use this pubkey. Instead it uses the pubkey stored in the full node. 
 -define(period, 10).%how long to wait in seconds before checking if new mining data is available.
@@ -48,7 +48,7 @@ read_nonce(N) ->
     io:fwrite(integer_to_list(N)),
     io:fwrite("\n"),
     case file:read_file("nonce.txt") of
-	{ok, <<Nonce:256>>} -> Nonce;
+	{ok, <<Nonce:184>>} -> Nonce;
 	{ok, <<>>} -> 
 	    io:fwrite("nonce failed "),
 	    io:fwrite(integer_to_list(N)),
@@ -66,7 +66,7 @@ speed_test() ->
     
 start_c_miners(R) ->
     {F, _, Third} = unpack_mining_data(R), %S is the nonce
-    RS = crypto:strong_rand_bytes(32),
+    RS = crypto:strong_rand_bytes(23),
     ok = file:write_file("nonce.txt", <<"">>),
     file:write_file("mining_input", <<F/binary, RS/binary, Third/binary>>),%32 byte hash, 32 byte nonce, integer
 %we write these bytes into a file, and then call the c program, and expect the c program to read the file.
