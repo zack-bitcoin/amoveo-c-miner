@@ -1,8 +1,6 @@
 Amoveo C miner
 =============
 
-This is the best miner for Amoveo currently available.
-
 
 ## Dependencies
 ```
