@@ -11,7 +11,7 @@ rm *.o
 # next recompile the erlang.
 erlc miner.erl
 # finally start an erlang interpreter so you can call the program.
-erl
+erl -s miner initialize
 
 # run like this `miner:start()`
 

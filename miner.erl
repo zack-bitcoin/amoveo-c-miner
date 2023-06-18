@@ -1,16 +1,20 @@
 -module(miner)
 .
--export([start/0, unpack_mining_data/1, speed_test/0]).
--define(Peer, "http://localhost:3011/").%for a full node on same computer.
+-export([start/0, unpack_mining_data/1, speed_test/0,
+        initialize/0]).
+%-define(Peer, "http://localhost:3011/").%for a test node on same computer.
 %-define(Peer, "http://localhost:8081/").%for a full node on same computer.
-%-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
+-define(Peer, "http://localhost:8085/").%for a mining pool on the same computer.
 %-define(Peer, "http://159.89.106.253:8085/").%for a mining pool on the server.
--define(CORES, 2).
+-define(CORES, 1).
 -define(Pubkey, <<"BCjdlkTKyFh7BBx4grLUGFJCedmzo4e0XT1KJtbSwq5vCJHrPltHATB+maZ+Pncjnfvt9CsCcI9Rn1vO+fPLIV4=">>). %If you are using a full node on the same computer, then it does not use this pubkey. Instead it uses the pubkey stored in the full node. 
--define(period, 10).%how long to wait in seconds before checking if new mining data is available.
+-define(period, 50).%10000).%how long to wait in miliseconds before checking if new mining data is available.
 -define(pool_sleep_period, 1000).%How long to wait in miliseconds if we cannot connect to the mining pool.
 -define(miner_sleep, 0). %This is how you reduce the load on CPU. It sleeps this long in miliseconds between mining cycles.
 
+
+initialize() ->
+    application:start(inets).
 
 start_many(N, _) when N < 1-> [];
 start_many(N, Me) -> 
@@ -44,9 +48,9 @@ start2() ->
     end.
 read_nonce(0) -> 0;
 read_nonce(N) ->
-    io:fwrite("read nonce n is "),
-    io:fwrite(integer_to_list(N)),
-    io:fwrite("\n"),
+    %io:fwrite("read nonce n is "),
+    %io:fwrite(integer_to_list(N)),
+    %io:fwrite("\n"),
     case file:read_file("nonce.txt") of
 	{ok, <<Nonce:184>>} -> Nonce;
 	{ok, <<>>} -> 
@@ -86,7 +90,7 @@ start_c_miners(R) ->
 		    io:fwrite("Found a block. 2\n"),
 		    timer:sleep(200)
 	    end
-    after (?period * 1000) ->
+    after (?period) ->
 	    kill_os_mains(),
             io:fwrite("did not find a block in that period \n"),
             ok
@@ -94,15 +98,19 @@ start_c_miners(R) ->
     timer:sleep(?miner_sleep),
     start2().
 talk_helper2(Data, Peer) ->
+    %io:fwrite("talk helper 2\n"),
     httpc:request(post, {Peer, [], "application/octet-stream", iolist_to_binary(Data)}, [{timeout, 3000}], []).
 talk_helper(_Data, _Peer, 0) -> throw("talk helper failed");
 talk_helper(Data, Peer, N) ->
     case talk_helper2(Data, Peer) of
-        {ok, {_Status, _Headers, []}} ->
+        {ok, {Status, Headers, []}} ->
             io:fwrite("server gave confusing response\n"),
+            io:fwrite({Status, Headers, Data, Peer}),
             timer:sleep(?pool_sleep_period),
             talk_helper(Data, Peer, N-1);
-        {ok, {_, _, R}} -> R;
+        {ok, {_, _, R}} -> 
+            %io:fwrite("talk helper 2 worked\n"),
+            R;
         %{error, _} ->
         E -> 
             io:fwrite("\nIf you are running a solo-mining node, then this error may have happened because you need to turn on and sync your Amoveo node before you can mine. You can get it here: https://github.com/zack-bitcoin/amoveo \n If this error happens while connected to the public mining node, then it can probably be safely ignored."),
